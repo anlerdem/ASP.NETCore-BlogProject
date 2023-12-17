@@ -5,12 +5,15 @@ using EntityLayer.Concrete;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CoreBlog.Controllers
 {
-	[AllowAnonymous]
-	public class BlogController : Controller
+    [AllowAnonymous]
+    public class BlogController : Controller
     {
 
         BlogManager bm = new BlogManager(new EfBlogRepository());
@@ -21,11 +24,11 @@ namespace CoreBlog.Controllers
         }
         public IActionResult BlogReadAll(int id)
         {
-            ViewBag.i=id;
+            ViewBag.i = id;
             var values = bm.GetBlogByID(id);
             return View(values);
         }
-        public IActionResult BlogListByWriter() 
+        public IActionResult BlogListByWriter()
         {
             var values = bm.GetBlogListByWriter(1);
             return View(values);
@@ -34,6 +37,14 @@ namespace CoreBlog.Controllers
         [HttpGet]
         public IActionResult BlogAdd()
         {
+            CategoryManager cm = new CategoryManager(new EfCategoryRepository());
+            List<SelectListItem> categoryvalues = (from x in cm.GetList()
+                                                   select new SelectListItem
+                                                   {
+                                                       Text = x.CategoryName,
+                                                       Value = x.CategoryID.ToString()
+                                                   }).ToList();
+            ViewBag.cv = categoryvalues;
             return View();
         }
 
